@@ -244,7 +244,6 @@ def setup_env(c, compute_canada=False):
         "python -m venv env",
         "source env/bin/activate",
         "which python",
-        "pip install -r requirements.txt",
         "pip install -e .",
     ]
 

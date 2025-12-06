@@ -13,7 +13,9 @@ dependencies = [
     "joblib",
     "pandas",
     "Pillow",
-    "invoke"
+    "invoke",
+    "airoh",
+    "cneuromod_vg_utils @ git+https://github.com/courtois-neuromod/videogames.utils.git"
 ]
 description = "A set of functions and code to replay games of Super Mario Bros. acquired in the CNeuroMod mario dataset."
 authors = [{name = "Yann Harel"}]
