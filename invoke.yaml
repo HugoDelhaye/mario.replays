@@ -1,12 +1,12 @@
 # Configuration for mario.replays project
 
 # Dataset paths
-mario_dataset: sourcedata/mario
+mario_dataset: ../mario
 output_dir: ./
 
 # Game configuration
 game_name: SuperMarioBros-Nes
-stimuli_path: null  # Defaults to {mario_dataset}/mario.stimuli
+stimuli_path: null  # Defaults to {mario_dataset}/stimuli
 
 # Processing options
 n_jobs: -1  # Use all available CPU cores
