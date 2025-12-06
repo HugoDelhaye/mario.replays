@@ -258,34 +258,10 @@ def process_bk2_file(task, args):
     gc.collect()
 
 
-def _configure_logging(verbose, log_file=None):
+def _configure_logging(verbose):
     """Set up logging configuration."""
     level = logging.INFO if verbose else logging.WARNING
-
-    # Set up handlers
-    handlers = []
-
-    # Console handler (always present)
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(level)
-    console_handler.setFormatter(logging.Formatter("%(message)s"))
-    handlers.append(console_handler)
-
-    # File handler (optional)
-    if log_file:
-        # Use buffering=1 for line buffering to write immediately
-        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
-        file_handler.setLevel(logging.INFO)  # Always log INFO to file
-        file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
-        handlers.append(file_handler)
-        print(f"Logging to file: {log_file}")
-
-    logging.basicConfig(level=level, format="%(message)s", handlers=handlers, force=True)
-
-    # Ensure immediate flushing for all handlers
-    for handler in logging.getLogger().handlers:
-        if isinstance(handler, logging.FileHandler):
-            handler.flush()
+    logging.basicConfig(level=level, format="%(message)s", force=True)
 
 
 def _determine_phase(events_dataframe):
@@ -388,7 +364,7 @@ def main(args):
     Args:
         args: Parsed command-line arguments
     """
-    _configure_logging(args.verbose, args.log_file if hasattr(args, 'log_file') else None)
+    _configure_logging(args.verbose)
     data_path = op.abspath(args.datapath)
 
     # Set up stimuli path once before parallel processing to avoid race conditions
@@ -461,11 +437,6 @@ if __name__ == "__main__":
         help="Save the variables file (.json) that contains game variables.",
     )
     parser.add_argument(
-        "--save_states",
-        action="store_true",
-        help="Save full RAM state at each frame into a *_states.npy file.",
-    )
-    parser.add_argument(
         "--save_ramdumps",
         action="store_true",
         help="Save RAM dumps at each frame into a *_ramdumps.npy file.",
@@ -486,12 +457,6 @@ if __name__ == "__main__":
         "--verbose",
         action="store_true",
         help="Display verbose output.",
-    )
-    parser.add_argument(
-        "--log-file",
-        type=str,
-        default=None,
-        help="Path to log file for detailed timing and progress information.",
     )
     parser.add_argument(
         "--subjects",

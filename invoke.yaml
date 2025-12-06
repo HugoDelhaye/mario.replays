@@ -2,19 +2,18 @@
 
 # Dataset paths
 mario_dataset: sourcedata/mario
-output_dir: outputdata/replays
+output_dir: ./
 
 # Game configuration
 game_name: SuperMarioBros-Nes
-game_name_simple: SuperMarioBrosSimple-Nes
-stimuli_path: sourcedata/mario/mario.stimuli
+stimuli_path: null  # Defaults to {mario_dataset}/mario.stimuli
 
 # Processing options
 n_jobs: -1  # Use all available CPU cores
-save_videos: false
+save_videos: true
 save_variables: true
-save_ramdumps: false
-save_confs: false
+save_ramdumps: true
+save_confs: true
 
 # Python environment
 requirements_file: requirements.txt
