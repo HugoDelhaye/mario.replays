@@ -23,10 +23,10 @@ def create_replays(
     stimuli=None,
     output=None,
     n_jobs=None,
-    save_videos=False,
-    save_variables=True,
-    save_ramdumps=False,
-    save_confs=False,
+    save_videos=None,
+    save_variables=None,
+    save_ramdumps=None,
+    save_confs=None,
     simple=False,
     verbose=False,
     subjects=None,
@@ -54,13 +54,13 @@ def create_replays(
     n_jobs : int, optional
         Number of parallel jobs (-1 for all cores). Defaults to n_jobs from invoke.yaml.
     save_videos : bool, optional
-        Save playback videos (.mp4). Default: False.
+        Save playback videos (.mp4). Defaults to save_videos from invoke.yaml.
     save_variables : bool, optional
-        Save game variables (.json). Default: True.
+        Save game variables (.json). Defaults to save_variables from invoke.yaml.
     save_ramdumps : bool, optional
-        Save RAM dumps (.npz). Default: False.
+        Save RAM dumps (.npz). Defaults to save_ramdumps from invoke.yaml.
     save_confs : bool, optional
-        Save psychophysical confounds (.npy). Default: False.
+        Save psychophysical confounds (.npy). Defaults to save_confs from invoke.yaml.
     simple : bool, optional
         Use simplified game version. Default: False.
     verbose : bool, optional
@@ -109,6 +109,19 @@ def create_replays(
 
     if n_jobs is None:
         n_jobs = c.config.get("n_jobs", -1)
+
+    # Resolve boolean flags from config if not explicitly set via CLI
+    if save_videos is None:
+        save_videos = c.config.get("save_videos", False)
+
+    if save_variables is None:
+        save_variables = c.config.get("save_variables", True)
+
+    if save_ramdumps is None:
+        save_ramdumps = c.config.get("save_ramdumps", False)
+
+    if save_confs is None:
+        save_confs = c.config.get("save_confs", False)
 
     # Validate paths
     if not op.exists(datapath):

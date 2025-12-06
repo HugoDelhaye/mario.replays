@@ -1,16 +1,17 @@
 # Configuration for mario.replays project
+# All values can be overridden via command-line flags
 
 # Dataset paths
-mario_dataset: ../mario
-output_dir: ./
+mario_dataset: ../mario          # Path to mario dataset root
+stimuli_path: null               # Path to stimuli (defaults to {mario_dataset}/stimuli)
+output_dir: outputdata/replays   # Output directory for derivatives
 
 # Game configuration
 game_name: SuperMarioBros-Nes
-stimuli_path: null  # Defaults to {mario_dataset}/stimuli
 
-# Processing options
-n_jobs: -1  # Use all available CPU cores
-save_videos: true
-save_variables: true
-save_ramdumps: true
-save_confs: true
+# Processing options (defaults for create-replays task)
+n_jobs: -1            # Number of parallel jobs (-1 = all CPU cores)
+save_videos: false    # Save playback videos (.mp4)
+save_variables: true  # Save game variables (.json)
+save_ramdumps: false  # Save RAM dumps (.npz)
+save_confs: false     # Save psychophysical confounds (.npy)
