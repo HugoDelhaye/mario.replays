@@ -54,8 +54,12 @@ def get_passage_order(bk2_df):
     Returns:
         DataFrame with added subject, session, level, global_idx, and level_idx columns
     """
-    bk2_df["subject"] = [_extract_subject_from_bk2(x) for x in bk2_df["bk2_file"].values]
-    bk2_df["session"] = [_extract_session_from_bk2(x) for x in bk2_df["bk2_file"].values]
+    bk2_df["subject"] = [
+        _extract_subject_from_bk2(x) for x in bk2_df["bk2_file"].values
+    ]
+    bk2_df["session"] = [
+        _extract_session_from_bk2(x) for x in bk2_df["bk2_file"].values
+    ]
     bk2_df["level"] = [_extract_level_from_bk2(x) for x in bk2_df["bk2_file"].values]
 
     bk2_df = bk2_df.sort_values(["subject", "session", "run", "idx_in_run"]).assign(
@@ -80,7 +84,7 @@ def _setup_game_config(args):
 def _setup_stimuli_path(args, data_path):
     """Set up and register stimuli path with retro."""
     if args.stimuli is None:
-        stimuli_path = op.abspath(op.join(data_path, "mario.stimuli"))
+        stimuli_path = op.abspath(op.join(data_path, "stimuli"))
     else:
         stimuli_path = op.abspath(args.stimuli)
     logging.debug(f"Adding stimuli path: {stimuli_path}")
@@ -118,7 +122,11 @@ def _check_outputs_exist(paths, args):
         missing.append("ramdump")
     if args.save_variables and not op.exists(paths["variables"]):
         missing.append("variables")
-    if hasattr(args, 'save_confs') and args.save_confs and not op.exists(paths["confs"]):
+    if (
+        hasattr(args, "save_confs")
+        and args.save_confs
+        and not op.exists(paths["confs"])
+    ):
         missing.append("confs")
 
     return len(missing) == 0, missing
@@ -135,11 +143,19 @@ def _build_output_paths(output_folder, bk2_file, subject, session):
         "json": op.join(beh_folder, "infos", f"{entities}.json"),
         "variables": op.join(beh_folder, "variables", f"{entities}.json"),
         "confs": op.join(beh_folder, "confs", f"{entities}_confs.npy"),
-        "entities": entities
+        "entities": entities,
     }
 
 
-def _save_optional_outputs(args, paths, replay_frames, replay_states, repetition_variables, audio_track, audio_rate):
+def _save_optional_outputs(
+    args,
+    paths,
+    replay_frames,
+    replay_states,
+    repetition_variables,
+    audio_track,
+    audio_rate,
+):
     """Save video, ramdump, variables, and confounds files if requested."""
     if args.save_videos:
         os.makedirs(os.path.dirname(paths["mp4"]), exist_ok=True)
@@ -180,15 +196,17 @@ def _save_optional_outputs(args, paths, replay_frames, replay_states, repetition
 def _create_and_save_sidecar(repetition_variables, task_metadata, paths):
     """Create and save JSON sidecar with replay metadata."""
     info_dict = create_sidecar_dict(repetition_variables)
-    info_dict.update({
-        "IndexInRun": task_metadata["idx_in_run"],
-        "Run": task_metadata["run"],
-        "IndexGlobal": task_metadata["global_idx"],
-        "IndexLevel": task_metadata["level_idx"],
-        "Phase": task_metadata["phase"],
-        "LevelFullName": task_metadata["level"],
-        "Bk2File": paths["entities"]
-    })
+    info_dict.update(
+        {
+            "IndexInRun": task_metadata["idx_in_run"],
+            "Run": task_metadata["run"],
+            "IndexGlobal": task_metadata["global_idx"],
+            "IndexLevel": task_metadata["level_idx"],
+            "Phase": task_metadata["phase"],
+            "LevelFullName": task_metadata["level"],
+            "Bk2File": paths["entities"],
+        }
+    )
 
     os.makedirs(os.path.dirname(paths["json"]), exist_ok=True)
     with open(paths["json"], "w") as f:
@@ -215,7 +233,9 @@ def process_bk2_file(task, args):
     # Set up stimuli path in each worker process for parallel processing
     _setup_stimuli_path(args, data_path)
 
-    bk2_file, run, idx_in_run, phase, subject, session, level, global_idx, level_idx = task
+    bk2_file, run, idx_in_run, phase, subject, session, level, global_idx, level_idx = (
+        task
+    )
     bk2_path = op.abspath(op.join(data_path, bk2_file))
 
     if not _validate_bk2_file(bk2_file, bk2_path):
@@ -229,22 +249,38 @@ def process_bk2_file(task, args):
         logging.info(f"Skipping (all outputs exist): {paths['entities']}")
         return
     else:
-        logging.info(f"Processing {paths['entities']} (missing: {', '.join(missing_outputs)})")
+        logging.info(
+            f"Processing {paths['entities']} (missing: {', '.join(missing_outputs)})"
+        )
 
     # Always get audio data (needed for videos and confounds)
-    repetition_variables, _, replay_frames, replay_states, audio_track, audio_rate = get_variables_from_replay(
-        op.join(data_path, bk2_file),
-        skip_first_step=(idx_in_run == 0),
-        game=args.game_name,
-        inttype=retro.data.Integrations.CUSTOM_ONLY,
-        return_audio=True,
+    repetition_variables, _, replay_frames, replay_states, audio_track, audio_rate = (
+        get_variables_from_replay(
+            op.join(data_path, bk2_file),
+            skip_first_step=(idx_in_run == 0),
+            game=args.game_name,
+            inttype=retro.data.Integrations.CUSTOM_ONLY,
+            return_audio=True,
+        )
     )
 
-    _save_optional_outputs(args, paths, replay_frames, replay_states, repetition_variables, audio_track, audio_rate)
+    _save_optional_outputs(
+        args,
+        paths,
+        replay_frames,
+        replay_states,
+        repetition_variables,
+        audio_track,
+        audio_rate,
+    )
 
     task_metadata = {
-        "idx_in_run": idx_in_run, "run": run, "global_idx": global_idx,
-        "level_idx": level_idx, "phase": phase, "level": level
+        "idx_in_run": idx_in_run,
+        "run": run,
+        "global_idx": global_idx,
+        "level_idx": level_idx,
+        "phase": phase,
+        "level": level,
     }
     _create_and_save_sidecar(repetition_variables, task_metadata, paths)
 
@@ -292,12 +328,14 @@ def _collect_bk2_info_from_events(run_events_file):
     bk2_list = []
     for idx_in_run, bk2_file in enumerate(bk2_files):
         if isinstance(bk2_file, str) and ".bk2" in bk2_file:
-            bk2_list.append({
-                "bk2_file": bk2_file,
-                "run": run,
-                "idx_in_run": idx_in_run,
-                "phase": phase,
-            })
+            bk2_list.append(
+                {
+                    "bk2_file": bk2_file,
+                    "run": run,
+                    "idx_in_run": idx_in_run,
+                    "phase": phase,
+                }
+            )
     return bk2_list
 
 
@@ -371,8 +409,8 @@ def main(args):
     _setup_stimuli_path(args, data_path)
 
     # Get subject/session filters if provided
-    subjects = getattr(args, 'subjects', None)
-    sessions = getattr(args, 'sessions', None)
+    subjects = getattr(args, "subjects", None)
+    sessions = getattr(args, "sessions", None)
 
     if subjects:
         logging.info(f"Filtering subjects: {', '.join(subjects)}")
@@ -415,7 +453,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--output",
-        default='outputdata/',
+        default="outputdata/",
         type=str,
         help="Path to the derivatives folder, where the outputs will be saved.",
     )
