@@ -14,6 +14,3 @@ save_videos: true
 save_variables: true
 save_ramdumps: true
 save_confs: true
-
-# Python environment
-requirements_file: requirements.txt
