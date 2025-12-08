@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mario_replays"
+version = "0.1"
+dependencies = [
+    "tqdm",
+    "tqdm_joblib",
+    "scikit-video",
+    "stable-retro",
+    "joblib",
+    "pandas",
+    "Pillow",
+    "invoke",
+    "airoh",
+    "cneuromod_vg_utils @ git+https://github.com/courtois-neuromod/videogames.utils.git"
+]
+description = "A set of functions and code to replay games of Super Mario Bros. acquired in the CNeuroMod mario dataset."
+authors = [{name = "Yann Harel"}]
+license = {text = "MIT"}
+
+[tool.setuptools.packages.find]
+where = ["code"]
