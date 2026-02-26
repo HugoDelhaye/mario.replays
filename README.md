@@ -29,7 +29,7 @@ cd mario.replays
 pip install -e .
 
 # Or with airoh (Recommended)
-pip install airoh
+pip install airoh invoke
 invoke setup-env
 
 # Download the cneuromod mario dataset
