@@ -26,7 +26,6 @@ For each `.bk2` replay file:
 # Install
 git clone git@github.com:courtois-neuromod/mario.replays
 cd mario.replays
-pip install -r requirements.txt
 pip install -e .
 
 # Or with airoh
